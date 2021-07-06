@@ -43,7 +43,7 @@ MUTAG
  
 ## Citing our work
 
-Please cite our work using the following:
+Please use the following BibTeX citation when referencing our work:
 
 ```
 @inproceedings{OBray21a,
