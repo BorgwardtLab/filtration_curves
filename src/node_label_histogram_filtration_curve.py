@@ -138,7 +138,10 @@ def load_curves(args):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', help='dataset')
+    parser.add_argument(
+            '--dataset', 
+            help='dataset'
+            )
     parser.add_argument(
             '--method',
             default="transductive",
@@ -149,14 +152,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     # generate the filtration curves (saved to csv for easier handling)
-    create_curve()
+    #create_curve()
 
     #
     list_of_df, y, column_names = load_curves(args)
 
     n_graphs = len(y)
     n_node_labels = list_of_df[0].shape[1]
-
 
     if args.method == "transductive":
         # standardize the size of the vector by forward filling then convert
@@ -172,3 +174,6 @@ if __name__ == '__main__':
             X.append(graph_representation)
         
         run_rf(X, y)
+
+    elif args.method == "inductive":
+        run_rf_inductive(list_of_df, y, column_names=column_names) 
