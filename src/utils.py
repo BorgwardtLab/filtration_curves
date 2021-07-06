@@ -40,7 +40,6 @@ def node_label_distribution(filtration, label_to_index):
     return(D)
 
 
-
 def create_metric_dict(
         metrics=["accuracy"]
         ):
