@@ -43,4 +43,20 @@ MUTAG
  
 ## Citing our work
 
+Please cite our work using the following:
+
+```
+@inproceedings{OBray21a,
+    title        = {Filtration Curves for Graph Representation},
+    author       = {O'Bray, Leslie and Rieck, Bastian and Borgwardt, Karsten},
+    author+an    = {1=first; 2=first, highlight},
+    doi          = {10.1145/3447548.3467442},
+    year         = 2021,
+    booktitle    = {Proceedings of the 27th ACM SIGKDD International
+                 Conference on Knowledge Discovery \& Data Mining~(KDD)},
+    publisher    = {Association for Computing Machinery},
+    address      = {New York, NY, USA},
+    pubstate     = {inpress},
+}
+```
 
