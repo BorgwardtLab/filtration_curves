@@ -24,7 +24,7 @@ def create_curve(args):
     """ Use the persistence diagram on all graphs and return
     a list of (creation, destruction) tuples per graph. """
     dataset = args.dataset
-    file_path = "../preprocessed_data/unlabeled_datasets/" + dataset + "/"
+    file_path = "../data/unlabeled_datasets/" + dataset + "/"
     
     # This section is the normal section to load the graphs.
     filenames = sorted(
@@ -97,6 +97,13 @@ if __name__ == "__main__":
             '--dataset', 
             help='Input file(s)', 
             )
+
+    parser.add_argument(
+            '--method',
+            default="transductive",
+            type=str,
+            help="transductive or inductive"
+            )
     
     args = parser.parse_args()
     
@@ -106,16 +113,16 @@ if __name__ == "__main__":
     # relabel y
     y = LabelEncoder().fit_transform(y)
 
+    if args.method == "transductive":
+        # get the union of all indexes of the filtration curve
+        new_index = filtration_curve_index(filtration_curves)
 
-    # get the union of all indexes of the betti curve
-    new_index = filtration_curve_index(filtration_curves)
-
-    # reindex each betti curve with the full index to standardize the size
-    filtration_curves = [reindex_filtration_curve(b, new_index) for b in
+        # reindex each betti curve with the full index to standardize the size
+        filtration_curves = [reindex_filtration_curve(b, new_index) for b in
             tqdm(filtration_curves)]
 
-    # convert to numpy 
-    filtration_curves = [i.to_numpy() for i in tqdm(filtration_curves)]
+        # convert to numpy 
+        filtration_curves = [i.to_numpy() for i in tqdm(filtration_curves)]
     
-    # run the random forest
-    run_rf(filtration_curves, y, args, n_iterations=10)
+        # run the random forest
+        run_rf(filtration_curves, y, n_iterations=10)

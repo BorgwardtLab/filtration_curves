@@ -6,6 +6,41 @@ import os
 
 from sklearn.metrics import accuracy_score
 
+
+def node_label_distribution(filtration, label_to_index):
+    '''
+    Calculates the node label distribution of a filtration, using a map
+    that stores index assignments for labels.
+
+    :param filtration: A filtration of graphs
+    :param label_to_index: A map between labels and indices, required to
+    calculate the histogram.
+
+    :return: Label distributions along the filtration. Each entry is
+    a tuple consisting of the weight of the filtration followed by a
+    count vector.
+    '''
+
+    # Will contain the distributions as count vectors; this is
+    # calculated for every step of the filtration.
+    D = []
+
+    for weight, graph in filtration:
+        labels = graph.vs['label']
+        counts = np.zeros(len(label_to_index))
+
+        for label in labels:
+            index = label_to_index[label]
+            counts[index] += 1
+
+        # The conversion ensures that we can serialise everything later
+        # on into a `pd.series`.
+        D.append((weight, counts.tolist()))
+
+    return(D)
+
+
+
 def create_metric_dict(
         metrics=["accuracy"]
         ):

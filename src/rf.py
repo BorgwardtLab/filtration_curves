@@ -1,4 +1,4 @@
-
+''' Random forest classifier '''
 
 import csv
 import glob
@@ -14,7 +14,6 @@ import pandas as pd
 from scipy.spatial import distance
 
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
@@ -22,7 +21,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 from utils import *
 
-def run_rf(K, y, args, n_iterations=10):
+def run_rf(X, y, n_iterations=10):
     random.seed(42)
 
     iteration_metrics = create_metric_dict()
@@ -39,10 +38,10 @@ def run_rf(K, y, args, n_iterations=10):
             ) 
 
         for train_index, test_index in cv.split(np.zeros(len(y)), y):
-            D_train = [K[i] for i in train_index]
+            X_train = [X[i] for i in train_index]
             y_train = [y[i] for i in train_index]
             
-            D_test = [K[i] for i in test_index]
+            X_test = [X[i] for i in test_index]
             y_test = [y[i] for i in test_index]
 
             clf = RandomForestClassifier(
@@ -52,16 +51,22 @@ def run_rf(K, y, args, n_iterations=10):
                     class_weight="balanced",
                     ) 
 
-            clf.fit(D_train, y_train)
-            y_pred = clf.predict(D_test)
+            clf.fit(X_train, y_train)
+            y_pred = clf.predict(X_test)
             
             with warnings.catch_warnings(): 
                 warnings.filterwarnings('ignore')
 
-                fold_metrics = compute_fold_metrics(y_test, y_pred,
-                        fold_metrics)
-        iteration_metrics = update_iteration_metrics(fold_metrics,
-                iteration_metrics)
+                fold_metrics = compute_fold_metrics(
+                        y_test, 
+                        y_pred,
+                        fold_metrics
+                        )
+                print(fold_metrics)
+        iteration_metrics = update_iteration_metrics(
+                fold_metrics,
+                iteration_metrics
+                )
     
     
     print_iteration_metrics(iteration_metrics)

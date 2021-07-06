@@ -1,4 +1,3 @@
-
 # #!/usr/bin/env python
 #
 # Provides a simple way to perform classification based on the
@@ -29,80 +28,96 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestClassifier
 
 #from select_thresholds import *
+from utils import *
 from train_test_split import *
+from rf import *
+from preprocessing.filtration import filtration_by_edge_attribute
 
 
-#def label_distribution_graph(graph, label_to_index):
-#    '''
-#    Calculates the node label distribution of a filtration, using a map
-#    that stores index assignments for labels.
-#
-#    :param filtration: A filtration of graphs
-#    :param label_to_index: A map between labels and indices, required to
-#    calculate the histogram.
-#
-#    :return: Label distributions along the filtration. Each entry is
-#    a tuple consisting of the weight of the filtration followed by a
-#    count vector.
-#    '''
-#
-#    # Will contain the distributions as count vectors; this is
-#    # calculated for every step of the filtration.
-#
-#    labels = graph.vs['label']
-#    counts = np.zeros(len(label_to_index))
-#
-#    for label in labels:
-#        index = label_to_index[label]
-#        counts[index] += 1
-#
-#        # The conversion ensures that we can serialise everything later
-#        # on into a `pd.series`.
-#
-#    return counts 
-#
-#
-#def graphs_to_label_counts(graphs):
-#
-#    node_labels = sorted(set(
-#        itertools.chain.from_iterable(graph.vs['label'] for graph in graphs)
-#    ))
-#
-#    label_to_index = {
-#        label: index for index, label in enumerate(sorted(node_labels))
-#    }
-#
-#
-#    counts = []
-#    for graph in graphs:
-#            
-#        distributions = label_distribution_graph(graph, label_to_index)
-#        counts.append(distributions)
-#
-#    return(counts)
+def create_curve(
+        source_path="../data/labeled_datasets/BZR_MD",
+        output_path="../data/labeled_datasets/preprocessed_data/BZR_MD/"
+        ):
+    ''' Creates the filtration curves and saves each curve as a csv in
+    an output directory for easier handling in the future '''
+
+    # get all file names
+    filenames = sorted(
+        glob.glob(os.path.join(source_path, '*.pickle'))
+        )
+
+    # load all graphs
+    graphs = [
+        ig.read(filename, format='picklez') for filename in tqdm(filenames)
+    ]
+
+    # sometimes the edge weight is stored as an edge attribute; we will
+    # change this to be an edge weight
+    for graph in graphs:
+        graph.es['weight'] = [e['attribute'] for e in graph.es]
+
+    # Get all potential node labels to make sure that the distribution
+    # can be calculated correctly later on.
+    node_labels = sorted(set(
+        itertools.chain.from_iterable(graph.vs['label'] for graph in graphs)
+    ))
+
+    label_to_index = {
+        label: index for index, label in enumerate(sorted(node_labels))
+    }
+   
+    # build the filtration using the edge weights
+    filtrated_graphs = [
+        filtration_by_edge_attribute(
+            graph,
+            attribute='weight',
+            delete_nodes=True,
+            stop_early=True
+        )
+        for graph in tqdm(graphs)
+    ]
+    
+    # Create a data frame for every graph and store it; the output is
+    # determined by the input filename, albeit with a new extension.
+    for index, filtrated_graph in enumerate(tqdm(filtrated_graphs)):
+        
+        df = pd.DataFrame(columns=['graph_label, weight'].extend(node_labels))
+
+        distributions = node_label_distribution(filtrated_graph, label_to_index)
+
+        for weight, counts in distributions:
+
+            row = {
+                'graph_label': graphs[index]['label'],
+                'weight': weight
+            }
+
+            row.update({
+                str(node_label): count for node_label, count in
+                zip(node_labels, counts)
+            })
+
+            df = df.append(row, ignore_index=True)
+        
+        output_name = os.path.basename(filenames[index])
+        output_name = os.path.splitext(output_name)[0] + '.csv'
+        output_name = os.path.join(output_path, output_name)
+
+        os.makedirs(output_path, exist_ok=True)
+
+        df.to_csv(output_name, index=False)
 
 
-
-if __name__ == '__main__':
-
-
-    start = time.time()
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', help='Input file(s)')
-    parser.add_argument('--n', type=int, default=100)
-
-    args = parser.parse_args()
+def load_curves(args):
+    ''' Load the stored curves '''
     
     # stores the graphs and graph labels
+    files = sorted(glob.glob(os.path.join(
+        "../data/labeled_datasets/preprocessed_data/" + args.dataset + "/", '*.csv'
+        )))
+
     y = []
     list_of_df = []
-    files = sorted(glob.glob(os.path.join(
-        "../preprocessed_data/labeled_datasets/" + args.dataset + "/",
-        '*.csv'
-        )))
-    dataset = args.dataset.split("_nodes")[0]
-    n_graphs = len(files)
-    n_iterations = 10
 
     # create list of dataframes (i.e. data) and y labels
     for idx, filename in enumerate(tqdm(files)):
@@ -116,62 +131,44 @@ if __name__ == '__main__':
     # get the column names
     example_file = list(pd.read_csv(files[0], header=0, index_col="weight").columns)
     column_names = [c for c in example_file if c not in ["graph_label"]]
-    #
-    # reindex
-    list_of_df, index = index_train_data(list_of_df, column_names)
 
-    all_X = []
-    for idx, sample in enumerate(list_of_df[0]):
-        person = []
-        for j in range(len(list_of_df)):
-            person.extend(list_of_df[j][idx])
-        all_X.append(person)
+    return(list_of_df, y, column_names)
 
-    iteration_accuracies = []
-        
-    for iteration in range(n_iterations):
-        start_time = time.time()
-        fold_accuracies = []
-        
-        cv = StratifiedKFold(
-                n_splits=10,
-                random_state=42 + iteration,
-                shuffle=True
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dataset', help='dataset')
+    parser.add_argument(
+            '--method',
+            default="transductive",
+            type=str,
+            help="transductive or inductive"
             )
 
-        for train_index, test_index in cv.split(np.zeros(n_graphs), y):
-            train_files = [all_X[i] for i in train_index]
-            test_files = [all_X[i] for i in test_index]
-            
-            D_train = [all_X[i] for i in train_index]   
-            y_train = y[train_index]
+    args = parser.parse_args()
+    
+    # generate the filtration curves (saved to csv for easier handling)
+    create_curve()
 
-            D_test = [all_X[i] for i in test_index]
-            y_test = y[test_index]
+    #
+    list_of_df, y, column_names = load_curves(args)
 
-            clf = RandomForestClassifier(
-                    max_depth=None, 
-                    random_state=0,
-                    class_weight="balanced", 
-                    n_estimators=1000) 
+    n_graphs = len(y)
+    n_node_labels = list_of_df[0].shape[1]
 
-            with warnings.catch_warnings(): 
-                warnings.filterwarnings('ignore', category=ConvergenceWarning)
-                clf.fit(D_train, y_train)
 
-            y_pred = clf.predict(D_test)
-            accuracy = accuracy_score(y_test, y_pred)
+    if args.method == "transductive":
+        # standardize the size of the vector by forward filling then convert
+        # to a vector representation. list_of_df now has length
+        # n_node_labels
+        list_of_df, index = index_train_data(list_of_df, column_names)
+        X = []
 
-            fold_accuracies.append(accuracy)
-
-            print(f'{accuracy * 100:2.2f}') # fold accuracy
-        end_time = time.time()
-        iteration_accuracies.append(np.mean(fold_accuracies))
-        print(iteration_accuracies)
-
-    mean_accuracy = np.mean(iteration_accuracies) * 100
-    sdev_accuracy = np.std(iteration_accuracies) * 100
-    print(f'{mean_accuracy:2.2f} +- {sdev_accuracy:2.2f}') #mean across iterations
-
-    end = time.time()
-    #print(dataset, end-start)
+        for graph_idx in range(n_graphs):
+            graph_representation = []
+            for node_label_idx in range(n_node_labels):
+                graph_representation.extend(list_of_df[node_label_idx][graph_idx])
+            X.append(graph_representation)
+        
+        run_rf(X, y)
