@@ -64,7 +64,6 @@ def run_rf(X, y, n_iterations=10):
                         y_pred,
                         fold_metrics
                         )
-                print(fold_metrics)
         iteration_metrics = update_iteration_metrics(
                 fold_metrics,
                 iteration_metrics
@@ -81,7 +80,7 @@ def run_rf_inductive(original_X, y, column_names, n_iterations=10):
     iteration_metrics = create_metric_dict()
     iteration_accuracies = []
     for iteration in range(n_iterations):
-        
+        print(iteration) 
         fold_metrics = create_metric_dict()
         fold_accuracies = []    
                 
@@ -150,7 +149,7 @@ def run_rf_inductive(original_X, y, column_names, n_iterations=10):
                         y_pred,
                         fold_metrics
                         )
-                print(fold_metrics)
+
         iteration_metrics = update_iteration_metrics(
                 fold_metrics,
                 iteration_metrics

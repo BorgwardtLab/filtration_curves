@@ -109,7 +109,7 @@ if __name__ == "__main__":
     
     # get filtration curves
     filtration_curves, y = create_curve(args)
-    
+
     # relabel y
     y = LabelEncoder().fit_transform(y)
 
@@ -126,3 +126,17 @@ if __name__ == "__main__":
     
         # run the random forest
         run_rf(filtration_curves, y, n_iterations=10)
+
+    elif args.method == "inductive":
+        # format the curves as a dataframe
+        filtration_curves = [pd.DataFrame(i._data) for i in tqdm(filtration_curves)]
+
+        # get the column names (just a single one here)
+        column_names = filtration_curves[0].columns.tolist()
+
+        # run the random forest
+        run_rf_inductive(
+                filtration_curves, 
+                y,
+                column_names=column_names
+                )
