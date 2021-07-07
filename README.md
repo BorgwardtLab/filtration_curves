@@ -27,29 +27,26 @@ In our work, we used two main graph descriptor functions: one using the node lab
 To run the node label histogram filtration curve, navigate to the `src`
 folder and type the following command into the terminal:
 
-```
-poetry run python node_label_histogram_filtration_curve.py --dataset
-BZR_MD
+```bash
+$ poetry run python node_label_histogram_filtration_curve.py --dataset BZR_MD
 ```
 
 To run the connected components filtration curve (using the Ricci
 curvature), navigate to the `src`
 folder and type the following command into the terminal:
 
-```
-poetry run python connected_components_filtration_curve.py --dataset
-MUTAG
+```bash
+$ poetry run python connected_components_filtration_curve.py --dataset MUTAG
 ```
  
 ## Citing our work
 
 Please use the following BibTeX citation when referencing our work:
 
-```
+```biblatex
 @inproceedings{OBray21a,
     title        = {Filtration Curves for Graph Representation},
     author       = {O'Bray, Leslie and Rieck, Bastian and Borgwardt, Karsten},
-    author+an    = {1=first; 2=first, highlight},
     doi          = {10.1145/3447548.3467442},
     year         = 2021,
     booktitle    = {Proceedings of the 27th ACM SIGKDD International
@@ -59,4 +56,3 @@ Please use the following BibTeX citation when referencing our work:
     pubstate     = {inpress},
 }
 ```
-
