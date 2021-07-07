@@ -43,7 +43,7 @@ $ poetry run python connected_components_filtration_curve.py --dataset MUTAG
 
 Please use the following BibTeX citation when referencing our work:
 
-```biblatex
+```bibtex
 @inproceedings{OBray21a,
     title        = {Filtration Curves for Graph Representation},
     author       = {O'Bray, Leslie and Rieck, Bastian and Borgwardt, Karsten},
