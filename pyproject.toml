@@ -14,12 +14,7 @@ python-igraph = "^0.8.3"
 sklearn = "^0.0"
 networkx = "^2.5"
 GraphRicciCurvature = "^0.5.2"
-grakel = "^0.1.8"
 seaborn = "^0.11.1"
-torch = "^1.9.0"
-torch-scatter = "^2.0.7"
-torch-sparse = "^0.6.10"
-torch-geometric = "^1.7.2"
 pyper = {git = "https://github.com/Pseudomanifold/pyper.git"}
 
 [tool.poetry.dev-dependencies]
