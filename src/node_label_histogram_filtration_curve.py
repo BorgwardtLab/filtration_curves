@@ -132,7 +132,7 @@ def load_curves(args):
     example_file = list(pd.read_csv(files[0], header=0, index_col="weight").columns)
     column_names = [c for c in example_file if c not in ["graph_label"]]
 
-    return(list_of_df, y, column_names)
+    return list_of_df, y, column_names
 
 
 if __name__ == '__main__':
@@ -176,4 +176,5 @@ if __name__ == '__main__':
         run_rf(X, y)
 
     elif args.method == "inductive":
-        run_rf_inductive(list_of_df, y, column_names=column_names) 
+        X = list_of_df
+        run_rf_inductive(X, y, column_names=column_names) 

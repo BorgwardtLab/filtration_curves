@@ -53,7 +53,7 @@ def create_curve(args):
     # general form since we do not make the same assumptions..
     creation_destruction_pairs = [make_betti_curve(a) for a,b in tqdm(diagrams)]
 
-    return(creation_destruction_pairs, y)
+    return creation_destruction_pairs, y
 
 
 
@@ -66,7 +66,7 @@ def filtration_curve_index(filtration_curves):
         else:
             df_index = df_index.union(curve._data.index)
 
-    return(sorted(list(set(df_index))))
+    return sorted(list(set(df_index)))
 
 
 
@@ -85,7 +85,7 @@ def reindex_filtration_curve(filtration_curve, new_index):
             new_index,
             method="ffill"
             ).fillna(0)
-    return(filtration_curve)
+    return filtration_curve
     
 
 

@@ -33,7 +33,7 @@ def index_train_data(train_files, column_names):
         for i, col in enumerate(column_names):
             X[i].append(tmp_df.iloc[:,i].transpose().to_numpy())
 
-    return(X, df_index)
+    return X, df_index
 
 
 def index_test_data(test_files, column_names, train_index):
@@ -59,4 +59,4 @@ def index_test_data(test_files, column_names, train_index):
         for i, col in enumerate(column_names):
             X[i].append(tmp_df.iloc[:,i].transpose().to_numpy())
 
-    return(X)
+    return X

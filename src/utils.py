@@ -37,7 +37,7 @@ def node_label_distribution(filtration, label_to_index):
         # on into a `pd.series`.
         D.append((weight, counts.tolist()))
 
-    return(D)
+    return D
 
 
 def create_metric_dict(
@@ -50,7 +50,7 @@ def create_metric_dict(
     for metric in metrics:
         metric_dict[metric] = []
 
-    return(metric_dict)
+    return metric_dict
 
 
 def compute_fold_metrics(y_test, y_pred, metrics_dict):
@@ -66,7 +66,7 @@ def compute_fold_metrics(y_test, y_pred, metrics_dict):
     # update dictionary values
     metrics_dict["accuracy"].append(accuracy)
 
-    return(metrics_dict)
+    return metrics_dict
 
 
 def update_fold_metrics(all_fold_metrics, single_fold_metrics):
@@ -75,7 +75,7 @@ def update_fold_metrics(all_fold_metrics, single_fold_metrics):
 
     for k in single_fold_metrics:
         all_fold_metrics[k].append(single_fold_metrics[k])
-    return(all_fold_metrics)
+    return all_fold_metrics
 
 
 def update_iteration_metrics(fold_metrics, iteration_metrics):
@@ -84,7 +84,7 @@ def update_iteration_metrics(fold_metrics, iteration_metrics):
     for metric in ["accuracy"]:
         iteration_metrics[metric].append(np.mean(fold_metrics[metric]))
 
-    return(iteration_metrics)
+    return iteration_metrics
 
 
 def print_iteration_metrics(iteration_metrics, f=None):
