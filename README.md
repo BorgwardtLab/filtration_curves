@@ -20,7 +20,7 @@ all weights in an `igraph` graph would be listed using the command `graph.es['we
 If your graphs do not have an edge weight, there are numerous ways to
 calculate them, which we detail in the paper. An example of how we added edge weights can be found in the `preprocessing/label_edges.py` file. 
 
-## Method
+## Method and Expected Output
 
 In our work, we used two main graph descriptor functions: one using the node label histogram and one tracking the amount of connected components. There is a file for each; but please note that the node label histogram requires that the graph has node labels.
 
@@ -31,6 +31,8 @@ folder and type the following command into the terminal:
 $ poetry run python node_label_histogram_filtration_curve.py --dataset BZR_MD
 ```
 
+This should return the following result in the command line: `accuracy: 75.61 +- 1.13`.
+ 
 To run the connected components filtration curve (using the Ricci
 curvature), navigate to the `src`
 folder and type the following command into the terminal:
@@ -38,6 +40,8 @@ folder and type the following command into the terminal:
 ```bash
 $ poetry run python connected_components_filtration_curve.py --dataset MUTAG
 ```
+
+This should return the following result in the command line: `accuracy: 87.31 +- 0.66`.
  
 ## Citing our work
 
