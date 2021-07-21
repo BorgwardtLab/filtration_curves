@@ -20,6 +20,15 @@ all weights in an `igraph` graph would be listed using the command `graph.es['we
 If your graphs do not have an edge weight, there are numerous ways to
 calculate them, which we detail in the paper. An example of how we added edge weights can be found in the `preprocessing/label_edges.py` file. 
 
+### How to run this on your own dataset
+
+To test out our method on your own dataset, create a directory in the
+`data` folder with your dataset name, and store each individual graph as
+an `igraph` graph (with edge weights) as its own pickle file. Then you
+can run the commands in the section below, replacing the name of the
+dataset with the name of the directory you created in the `data`
+folder.
+
 ## Method and Expected Output
 
 In our work, we used two main graph descriptor functions: one using the node label histogram and one tracking the amount of connected components. There is a file for each; but please note that the node label histogram requires that the graph has node labels.
