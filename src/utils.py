@@ -9,16 +9,28 @@ from sklearn.metrics import accuracy_score
 
 def node_label_distribution(filtration, label_to_index):
     '''
-    Calculates the node label distribution of a filtration, using a map
-    that stores index assignments for labels.
+    Calculates the node label distribution along a filtration. 
 
-    :param filtration: A filtration of graphs
-    :param label_to_index: A map between labels and indices, required to
-    calculate the histogram.
+    Given a filtration from an individual graph, we calculate the node
+    label histogram (i.e. the count of each unique label) at each step
+    along that filtration, and returns a list of the weight of the filtration and
+    its associated count vector. 
 
-    :return: Label distributions along the filtration. Each entry is
-    a tuple consisting of the weight of the filtration followed by a
-    count vector.
+    Parameters
+    ----------
+    filtration : list
+        A filtration of graphs
+    label_to_index : mappable 
+        A map between labels and indices, required to calculate the
+        histogram.
+
+    Returns
+    -------
+    D : list
+        Label distributions along the filtration. Each entry is a tuple
+        consisting of the weight of the filtration followed by a count
+        vector.
+
     '''
 
     # Will contain the distributions as count vectors; this is
@@ -40,11 +52,22 @@ def node_label_distribution(filtration, label_to_index):
     return D
 
 
-def create_metric_dict(
-        metrics=["accuracy"]
-        ):
-    """ creates and returns a dict with an empty list for each of the included
-    metrics """
+def create_metric_dict(metrics=["accuracy"]):
+    '''
+    Creates a dictionary that will store the metrics calculated in cross
+    validation.
+
+    Parameters
+    ----------
+    metrics: list
+        Metrics that will be used to assess performance of the
+        classifier.
+
+    Returns
+    -------
+    metric_dict : dict 
+        Empty dictionary with the metrics of interest as keys.
+    '''
 
     metric_dict = {}
     for metric in metrics:
@@ -53,10 +76,33 @@ def create_metric_dict(
     return metric_dict
 
 
-def compute_fold_metrics(y_test, y_pred, metrics_dict):
-    """ computes the stardard metrics and updates the dictionary
-    containing all metric results. Input is true y, predicted y, and
-    current metrics dict """
+def compute_fold_metrics(y_test, y_pred, metric_dict):
+    '''
+    Calculates the metrics of interest on the classifier and updates the
+    dictionary with the values.
+
+    Given the true values (y_test) and the predicted values of
+    a classifier (y_pred), this function computes the metrics of
+    interest and updates the current dictionary (metrics_dict) with the value on
+    the given fold.
+
+    Parameters
+    ----------
+    y_test: array-like
+        True values of the test data 
+    y_pred: array-like 
+        Predicted values from the classifier
+    metric_dict: dict
+        Dictionary containing the metric of interest and the values so
+        far computed on previous folds
+    
+    Returns
+    -------
+    metric_dict : dict 
+        Updated dictionary values containing the metric of interest and
+        its value computed on the current fold
+    '''
+    
     if len(y_pred.shape) == 2:
         y_pred = y_pred[:, 1]
     
@@ -64,22 +110,37 @@ def compute_fold_metrics(y_test, y_pred, metrics_dict):
     accuracy = accuracy_score(y_test, y_pred)
     
     # update dictionary values
-    metrics_dict["accuracy"].append(accuracy)
+    metric_dict["accuracy"].append(accuracy)
 
-    return metrics_dict
-
-
-def update_fold_metrics(all_fold_metrics, single_fold_metrics):
-    ''' At the end of hyperparam optimization, adds the single fold
-    metrics to the all fold metrics dictionary'''
-
-    for k in single_fold_metrics:
-        all_fold_metrics[k].append(single_fold_metrics[k])
-    return all_fold_metrics
+    return metric_dict
 
 
 def update_iteration_metrics(fold_metrics, iteration_metrics):
-    """ Add average of fold metrics to iteration metrics """
+    '''
+    Updates the dictionary of iteration metrics with the average of the
+    fold metrics.
+
+    Updates the list of iteration-level metric results of the
+    classifier by appending the mean of the fold metrics.  This is
+    necessary when running multiple iterations of k-fold cross
+    validation.
+
+    Parameters
+    ----------
+    fold_metrics: dict  
+        A dictionary containing the metrics and their results evaluated
+        on the individual folds of cross validation.
+    iteration_metrics: dict 
+        A dictionary containing the metrics and the mean results from
+        all folds of k-fold cross validation.
+
+    Returns
+    -------
+    iteration_metrics: dict 
+        An updated dictionary of the iteration-level metrics, including
+        the current iteration.
+
+    '''
 
     for metric in ["accuracy"]:
         iteration_metrics[metric].append(np.mean(fold_metrics[metric]))
@@ -88,8 +149,21 @@ def update_iteration_metrics(fold_metrics, iteration_metrics):
 
 
 def print_iteration_metrics(iteration_metrics, f=None):
-    """ print the mean and sd of each of the metrics averaged over all
-    iterations """
+    '''
+    Prints the mean and standard deviation of the metrics over all
+    iterations.    
+
+    Parameters
+    ----------
+    iteration_metrics: dict
+        Dictionary of metrics and the mean accuracy on each iteration.
+    f: str
+        File name to save the results, if desired.
+
+    Returns
+    -------
+
+    '''
 
     for metric in iteration_metrics:#
         mean = np.mean(iteration_metrics[metric]) * 100
