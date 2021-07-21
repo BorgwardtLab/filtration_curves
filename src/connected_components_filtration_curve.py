@@ -20,7 +20,7 @@ import pyper.persistent_homology as ph
 
 
 
-def create_curve(args):
+def create_curves(args):
     """ Use the persistence diagram on all graphs and return
     a list of (creation, destruction) tuples per graph. """
     dataset = args.dataset
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # get filtration curves
-    filtration_curves, y = create_curve(args)
+    filtration_curves, y = create_curves(args)
 
     # relabel y
     y = LabelEncoder().fit_transform(y)

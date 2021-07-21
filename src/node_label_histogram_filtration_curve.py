@@ -34,7 +34,9 @@ from rf import *
 from preprocessing.filtration import filtration_by_edge_attribute
 
 
-def create_curve(
+
+
+def save_curves(
         source_path="../data/labeled_datasets/BZR_MD",
         output_path="../data/labeled_datasets/preprocessed_data/BZR_MD/"
         ):
@@ -135,6 +137,21 @@ def load_curves(args):
     return list_of_df, y, column_names
 
 
+def create_curves(args):
+
+    # check if filtration curves are already saved. If not, generate
+    # them and save them.
+    if not os.path.exists("../data/labeled_datasets/" + args.dataset
+    + "/"):
+        save_curves()
+    
+    # load saved curves (faster processing)
+    list_of_df, y, column_names = load_curves(args)
+    
+    return list_of_df, y, column_names
+    
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -152,10 +169,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     # generate the filtration curves (saved to csv for easier handling)
-    #create_curve()
-
-    #
-    list_of_df, y, column_names = load_curves(args)
+    list_of_df, y, column_names = create_curves(args)
 
     n_graphs = len(y)
     n_node_labels = list_of_df[0].shape[1]
