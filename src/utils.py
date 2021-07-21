@@ -32,7 +32,6 @@ def node_label_distribution(filtration, label_to_index):
         vector.
 
     '''
-
     # Will contain the distributions as count vectors; this is
     # calculated for every step of the filtration.
     D = []
@@ -67,8 +66,8 @@ def create_metric_dict(metrics=["accuracy"]):
     -------
     metric_dict : dict 
         Empty dictionary with the metrics of interest as keys.
-    '''
 
+    '''
     metric_dict = {}
     for metric in metrics:
         metric_dict[metric] = []
@@ -101,8 +100,8 @@ def compute_fold_metrics(y_test, y_pred, metric_dict):
     metric_dict : dict 
         Updated dictionary values containing the metric of interest and
         its value computed on the current fold
+
     '''
-    
     if len(y_pred.shape) == 2:
         y_pred = y_pred[:, 1]
     
@@ -141,7 +140,6 @@ def update_iteration_metrics(fold_metrics, iteration_metrics):
         the current iteration.
 
     '''
-
     for metric in ["accuracy"]:
         iteration_metrics[metric].append(np.mean(fold_metrics[metric]))
 
@@ -164,7 +162,6 @@ def print_iteration_metrics(iteration_metrics, f=None):
     -------
 
     '''
-
     for metric in iteration_metrics:#
         mean = np.mean(iteration_metrics[metric]) * 100
         sdev = np.std(iteration_metrics[metric]) * 100
