@@ -13,6 +13,7 @@ import igraph as ig
 from sklearn.preprocessing import LabelEncoder
 
 from rf import *
+from utils import *
 from preprocessing import relabel_edges as r
 
 from pyper.representations import BettiCurve, make_betti_curve
@@ -21,8 +22,26 @@ import pyper.persistent_homology as ph
 
 
 def create_curves(args):
-    """ Use the persistence diagram on all graphs and return
-    a list of (creation, destruction) tuples per graph. """
+    '''
+    Creates the connected component filtration curves. 
+
+    Uses the persistence diagram to create a filtration curve using the
+    count of connected components. We use the BettiCurve function from
+    the pyper package to do this.
+
+    Parameters
+    ----------
+    args: dict 
+        Command line arguments, used to determine the dataset 
+
+    Returns
+    -------
+    filtration_curves: list
+        A list of connected component filtration curves.
+    y: list
+        List of graph labels, necessary for classification.
+
+    '''
     dataset = args.dataset
     file_path = "../data/unlabeled_datasets/" + dataset + "/"
     
@@ -51,42 +70,9 @@ def create_curves(args):
     # use the function from pyper to create the curve for us. We use the
     # betti curve for the calculation, but our instance is a more
     # general form since we do not make the same assumptions..
-    creation_destruction_pairs = [make_betti_curve(a) for a,b in tqdm(diagrams)]
+    filtration_curves = [make_betti_curve(a) for a,b in tqdm(diagrams)]
 
-    return creation_destruction_pairs, y
-
-
-
-def filtration_curve_index(filtration_curves):
-    """ Gets the union of all Betti curve indexes. """
-    df_index = None
-    for idx, curve in enumerate(tqdm(filtration_curves)):
-        if idx == 0:
-            df_index = curve._data.index
-        else:
-            df_index = df_index.union(curve._data.index)
-
-    return sorted(list(set(df_index)))
-
-
-
-def reindex_filtration_curve(filtration_curve, new_index):
-    """ Reindex a filtration curve to have full index of the dataset. This
-    requires getting rid of duplicates, since there seem to be some in
-    the IMDB-BINARY dataset. """
-
-    # get rid of duplicates
-    filtration_curve = BettiCurve(
-            filtration_curve._data.loc[~filtration_curve._data.index.duplicated(keep="last")]
-            )
-
-    # reindex with full index
-    filtration_curve = filtration_curve._data.reindex(
-            new_index,
-            method="ffill"
-            ).fillna(0)
-    return filtration_curve
-    
+    return filtration_curves, y
 
 
 if __name__ == "__main__":

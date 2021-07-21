@@ -5,6 +5,7 @@ from tqdm import tqdm
 import os
 
 from sklearn.metrics import accuracy_score
+from pyper.representations import BettiCurve, make_betti_curve
 
 
 def node_label_distribution(filtration, label_to_index):
@@ -49,6 +50,66 @@ def node_label_distribution(filtration, label_to_index):
         D.append((weight, counts.tolist()))
 
     return D
+
+
+def filtration_curve_index(filtration_curves):
+    '''
+    Gets the union of all edge weights from the filtration curve. 
+
+    Given the connected components filtration curves, gets the union of
+    all edge weights. 
+
+    Parameters
+    ----------
+    filtration_curves: list
+        A list of the connected component filtrations.
+
+    Returns
+    -------
+    full_index : index
+        The full index of all curves.
+    '''
+
+    df_index = None
+    for idx, curve in enumerate(tqdm(filtration_curves)):
+        if idx == 0:
+            df_index = curve._data.index
+        else:
+            df_index = df_index.union(curve._data.index)
+    full_index = sorted(list(set(df_index)))
+
+    return full_index
+
+
+def reindex_filtration_curve(filtration_curve, new_index):
+    '''
+    Reindexes all connected components filtration curves with the union
+    of all edge weights.
+
+    Parameters
+    ----------
+    filtration_curve: pd.DataFrame 
+        The connected component filtration curve.
+    new_index: index
+        The new index to use.
+
+    Returns
+    -------
+    filtration_curve : pd.DataFrame
+        The filtration curve that has been reindexed.
+
+    ''' 
+    # get rid of duplicates
+    filtration_curve = BettiCurve(
+            filtration_curve._data.loc[~filtration_curve._data.index.duplicated(keep="last")]
+            )
+
+    # reindex with full index
+    filtration_curve = filtration_curve._data.reindex(
+            new_index,
+            method="ffill"
+            ).fillna(0)
+    return filtration_curve
 
 
 def create_metric_dict(metrics=["accuracy"]):
