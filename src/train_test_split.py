@@ -11,7 +11,32 @@ import pandas as pd
 
 
 def index_train_data(train_files, column_names):
-    '''Creates the threshold index based on the training data'''
+    '''
+    Creates a common index of weights based on the training data. 
+
+    Takes a dataset of filtrations, with each filtration stored as
+    a pandas DataFrame, and builds a common index to standardize the
+    data. Each filtration gets reindexed with all the thresholds in the
+    entire training dataset, and the values of graph descriptor function
+    are forward-filled if an individual filtration did not have
+    a specific value.
+
+    Parameters
+    ----------
+    train_files : list
+        A list of pd.DataFrames where the edge weight is the index of
+        the dataframe, and the columns are the node label histograms 
+    column_names: list 
+        A list of column names from the pd.DataFrames in train_files
+
+    Returns
+    -------
+    X : list
+        A list of the reindexed filtrations.
+    df_index: index
+        The union of all edge weights included in the training data.
+
+    '''
     X = [[] for i in column_names]
     
     # Create shared index of all training thresholds
@@ -37,8 +62,32 @@ def index_train_data(train_files, column_names):
 
 
 def index_test_data(test_files, column_names, train_index):
-    '''Reindexes the test datasets using the closest threshold from the training data'''
+    '''
+    Reindexes the test data filtrations with the training data edge
+    weights.
+    
+    Takes the test data filtrations and reindexes them with the training
+    data edge weights. If a given test edge weight does not exist in the
+    training dataset, it is replaced with the closets edge weight in the
+    training data.
+    
+    Parameters
+    ----------
+    test_files: list
+        A list of pd.DataFrames where the edge weight is the index of
+        the dataframe, and the columns are the node label histograms 
+    column_names: list 
+        A list of column names from the pd.DataFrames in test_files
+    train_index: index
+        The edge weights in the training data
 
+    Returns
+    -------
+    X : list
+        The test dataset that has been reindexed to the training
+        thresholds. It is a list of pd.DataFrames, one per data point.
+
+    '''
     X = [[] for i in column_names]   
     
     for df in test_files:
