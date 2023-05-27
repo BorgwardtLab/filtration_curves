@@ -47,7 +47,7 @@ def filtration_by_edge_attribute(
     n_nodes = graph.vcount()
     
     # print(len(weights))    
-    if weights.size != 1: # hack to deal with funny graph that has a single edge and was gettnig 0-D errors
+    if weights.size != 1: # hack to deal with funny graph that has a single edge and was getting 0-D errors
         weights = weights
         x = False
     else:
