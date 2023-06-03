@@ -40,7 +40,7 @@ def create_curves(args):
 
     Creates a node label histogram filtration curve, either by loading
     the previously generated filtration curves, or by calling
-    save_curves(), which will generate the curves and same them as a csv
+    save_curves(), which will generate the curves and save them as a csv
     file.
 
     Parameters
