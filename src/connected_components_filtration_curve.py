@@ -56,7 +56,7 @@ def create_curves(args):
     
     y = [graph['label'] for graph in graphs]
     
-    # add the vertex creation weight as the node degee
+    # add the vertex creation weight as the node degree
     for graph in tqdm(graphs):
         graph.vs["weight"] = [graph.degree(v) for v in graph.vs]
     diagrams = [
