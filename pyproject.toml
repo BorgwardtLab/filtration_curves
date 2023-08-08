@@ -3,6 +3,9 @@ name = "Filtration_Curves"
 version = "0.1.0"
 description = ""
 authors = ["Leslie O'Bray <leslie.obray@bsse.ethz.ch>"]
+packages = [
+    { include = "src", from="." },
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
